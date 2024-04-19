@@ -1,4 +1,8 @@
-use tch::{nn, nn::Module, Device};
+use tch::{nn, nn::Module};
+
+mod graph;
+mod cli;
+mod parser;
 
 fn net(vs: &nn::Path) -> impl Module {
     nn::seq()
