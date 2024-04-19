@@ -1,11 +1,9 @@
-use std::io::Write;
-use std::io::stdout;
 use std::process::exit;
 use std::time::Instant;
 use clap::Parser;
 use clap::arg;
 use crate::parser;
-
+use crate::nn::*;
 pub enum Format {
     APX,
     CNF
@@ -18,32 +16,18 @@ pub enum Problem {
 pub enum Semantics {
     CO,ST,SST,STG,ID,PR
 }
-#[derive(Debug, Clone, Copy, Default)]
-pub enum Heuristic {
-    HARPER,
-    #[default]
-    HCAT,
-    INOUT,
-    NoSelfAtt,
-    Card,
-    Max,
-    Counting,
-
-}
 #[derive(Debug, Clone)]
 pub struct Task {
     pub problem : Problem,
+    pub problem_name : String,
     pub semantics : Semantics,
     pub argument : usize,
-    pub algo : Heuristic,
     pub verbose : bool,
-    pub new : bool,
-    pub threshold : Option<f64>,
 }
 
 #[derive(Parser, Debug)]
 #[command(author="Paul Cibier", version, about="This tool can solve all the problems in the approximate track of ICCMA 2023",
-long_about = None)]
+long_about = None, arg_required_else_help = true)]
 struct Cli {
     #[arg(short, long)]
     /// Quary argument for credulous and skeptical acceptance
@@ -60,21 +44,11 @@ struct Cli {
     #[arg(long)]
     /// Prints the supported computational problems and exits
     problems : bool,
-    /// Avalaible options : harper, inout, hcat, noselfatt, card, maxb, counting
-    #[arg(long)]
-    heuristic : Option<String>,
     /// Print details of the execution time of each part of the solution
-    /// "to parse the file ; to solve the grounded extention ; to solve with an heuristic ; the result "
+    /// "FILE ; GROUNDED ; HEURISTIC ; OUTPUT "
     #[arg(short, long, verbatim_doc_comment)]
     verbose : bool,
-    /// Choose which algo is used for the grounded part, if set then use the new one
-    #[arg(short, long)]
-    new : bool,
-    ///Choose the value of the threshold for the graduated semantic
-    #[arg(short, long)]
-    thresold : Option<f64>,
 }
-
 
 pub fn launcher() {
     let cli = Cli::parse();
@@ -93,6 +67,7 @@ pub fn launcher() {
         }
     };
     let pr_sm = cli.task.clone();
+    let problem_name = pr_sm.clone().unwrap();
     let (problem, semantics) = match pr_sm {
         Some(t) => {
             if !t.contains('-') {
@@ -124,26 +99,8 @@ pub fn launcher() {
             exit(1) 
         }
     };
-    let mut algo = Heuristic::HCAT;
-    if let Some(x) = cli.heuristic {
-        match x.as_str() {
-            "harper" => algo = Heuristic::HARPER,
-            "hcat" => algo = Heuristic::HCAT,
-            "inout" => algo = Heuristic::INOUT,
-            "noselfatt" => algo = Heuristic::NoSelfAtt,
-            "card" => algo = Heuristic::Card,
-            "maxb" => algo = Heuristic::Max,
-            "counting" => algo = Heuristic::Counting,
-            _ => {
-                eprintln!("The heuristic {x} is not know, look at the help section for more detail");
-                exit(1);
-            }
-        }
-    }
-    let task = Task { problem, semantics, argument : argument_name, algo,
+    let task = Task { problem, problem_name, semantics, argument : argument_name, 
         verbose : cli.verbose,
-        new : cli.new,
-        threshold : cli.thresold
     };
     let file = cli.input_af.clone().unwrap();
     let file_path = file.as_str();
@@ -161,8 +118,8 @@ pub fn launcher() {
     if task.verbose {
         print!("{};",start.elapsed().as_millis() as f32 / 1000.0);
     }
-    let _ = stdout().flush();
 
+    af_nn(af, task);
 }
 
 fn print_supported_problems() {
