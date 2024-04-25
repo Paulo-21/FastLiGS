@@ -19,10 +19,11 @@ pub fn reading_cnf( file_path : &str) -> ArgumentationFramework {
     let nb_arg = iter[2].parse::<usize>().unwrap();
     let mut af = ArgumentationFramework::new(nb_arg);
     for line in content_iter {
-        if !line.is_empty() && !line.starts_with('#') {
+        if /* !line.is_empty() && */ !line.starts_with('#') {
             let (attacker,target) = parse_cnfattack_line(line);
             af.add_attack(attacker, target);
         }
+        
     }
     af
 }
