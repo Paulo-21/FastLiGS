@@ -15,9 +15,6 @@ use std::time::Instant;
 
 fn use_nn(task : Task, hcat : f64, nsa : f64, card : f64, maxb :f64, gr : f32, in_degree_c : f32, out_degree_c : f32, sa : f32) {
     let now = Instant::now();
-    /*let mut path = String::from("../IAFGNN/model_ln/model_ln_");
-    path.push_str(&task.problem_name);
-    path.push_str(".pt");*/
 
     let v : [f32;8]= [gr, hcat as f32, card as f32, nsa as f32, maxb as f32, in_degree_c, out_degree_c, sa];
     
@@ -26,7 +23,6 @@ fn use_nn(task : Task, hcat : f64, nsa : f64, card : f64, maxb :f64, gr : f32, i
     }
     let device = NdArrayDevice::default();
     let inputs = Tensor::<NdArray, 1>::from_data(v, &device);
-    //let inputs: Tensor<NdArray, 2> = input.reshape([1, 8]);
 
     let proba = match task.problem {
         Problem::DC => {
@@ -83,10 +79,10 @@ pub fn af_nn(af : ArgumentationFramework, task : Task)  {
     let start = Instant::now();
     let gr = gr_solver::solve(&af);
     if gr.contains(&task.argument) {
-        println!("YES");
         if task.verbose {
-			print!("None;None;");
+            print!("None;None;");
 		}
+        println!("YES");
         exit(0);
     }
     for attacker in &af.af_attacker[task.argument] {
