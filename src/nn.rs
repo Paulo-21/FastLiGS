@@ -25,8 +25,8 @@ fn use_nn(task : Task, hcat : f64, nsa : f64, card : f64, maxb :f64, gr : f32, i
         println!("{};", now.elapsed().as_millis() as f32 /1000.);
     }
     let device = NdArrayDevice::default();
-    let input = Tensor::<NdArray, 1>::from_data(v, &device);
-    let inputs: Tensor<NdArray, 2> = input.reshape([1, 8]);
+    let inputs = Tensor::<NdArray, 1>::from_data(v, &device);
+    //let inputs: Tensor<NdArray, 2> = input.reshape([1, 8]);
 
     let proba = match task.problem {
         Problem::DC => {
