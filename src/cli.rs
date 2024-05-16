@@ -5,8 +5,8 @@ use clap::arg;
 use crate::parser;
 use crate::nn::*;
 pub enum Format {
-    APX,
-    CNF
+    Apx,
+    Cnf
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Problem {
@@ -14,7 +14,7 @@ pub enum Problem {
 }
 #[derive(Debug, Clone, Copy)]
 pub enum Semantics {
-    CO,ST,SST,STG,ID,PR
+    CO,ST,Sst,Stg,Id,PR
 }
 #[derive(Debug, Clone)]
 pub struct Task {
@@ -85,9 +85,9 @@ pub fn launcher() {
             let semantics = String::from(r.next().unwrap());
             let semantics = match semantics.as_str() {
                 "ST" => Semantics::ST,
-                "SST" => Semantics::SST,
-                "STG" => Semantics::STG,
-                "ID" => Semantics::ID,
+                "SST" => Semantics::Sst,
+                "STG" => Semantics::Stg,
+                "ID" => Semantics::Id,
                 "PR" => Semantics::PR,
                 "CO" => Semantics::CO,
                 _ => { eprintln!("This problem is not handled by the program at this time"); exit(1);}
@@ -107,13 +107,13 @@ pub fn launcher() {
     let start = Instant::now();
     let af = if let Some(fo) = cli.input_format {
         if fo == "apx" {
-            parser::get_input(file_path, Format::APX)
+            parser::get_input(file_path, Format::Apx)
         }
         else {
-             parser::get_input(file_path, Format::CNF)
+             parser::get_input(file_path, Format::Cnf)
         }
     } else {
-        parser::get_input(file_path, Format::CNF)
+        parser::get_input(file_path, Format::Cnf)
     };
     if task.verbose {
         print!("{};",start.elapsed().as_millis() as f32 / 1000.0);

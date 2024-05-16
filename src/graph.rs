@@ -1,6 +1,6 @@
 pub struct ArgumentationFramework {
-    pub af_attacker : Vec<Vec<i32>>,
-	pub af_attackee : Vec<Vec<i32>>,
+    pub af_attacker : Vec<Vec<u32>>,
+	pub af_attackee : Vec<Vec<u32>>,
     pub nb_argument : usize
 }
 
@@ -10,7 +10,8 @@ impl ArgumentationFramework {
         let af_attacker = vec![Vec::new();nb_arg];
         Self { af_attackee , af_attacker, nb_argument : nb_arg }
     }
-    pub fn add_attack(&mut self, attacker : i32, target : i32) {
+    #[inline(always)]
+    pub fn add_attack(&mut self, attacker : u32, target : u32) {
         self.af_attacker[(target-1) as usize].push(attacker-1);
         self.af_attackee[(attacker-1) as usize].push(target-1);
     }
