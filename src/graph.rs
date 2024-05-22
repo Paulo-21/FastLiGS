@@ -11,8 +11,10 @@ impl ArgumentationFramework {
         Self { af_attackee , af_attacker, nb_argument : nb_arg }
     }
     #[inline(always)]
-    pub fn add_attack(&mut self, attacker : u32, target : u32) {
-        self.af_attacker[(target-1) as usize].push(attacker-1);
-        self.af_attackee[(attacker-1) as usize].push(target-1);
+    pub fn add_attack(&mut self, mut attacker : u32, mut target : u32) {
+        attacker = attacker-1;
+        target = target-1;
+        self.af_attacker[target as usize].push(attacker);
+        self.af_attackee[attacker as usize].push(target);
     }
 }
