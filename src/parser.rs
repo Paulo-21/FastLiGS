@@ -30,7 +30,7 @@ pub fn _reading_cnf( file_path : &str) -> ArgumentationFramework {
 }
 #[inline(always)]
 fn bytes_to_int(bytes: &[u8]) -> u32 {
-    bytes.iter().take(12).fold(0, |acc, b| acc * 10 + (b & 0x0f) as u32)
+    bytes.iter().take(12).fold(0, |acc, b| acc * 10 + (b & 0x0f) as u32) - 1
 }
 pub fn reading_cnf_perf( file_path : &str) -> ArgumentationFramework{
     let mmap: Mmap;
@@ -46,24 +46,25 @@ pub fn reading_cnf_perf( file_path : &str) -> ArgumentationFramework{
     let Some(separator) = memchr(b' ', data) else {panic!("oups")};
     data = &data[separator+1..];
     let end = memchr(b'\n', data).unwrap();
-    let nb_arg = bytes_to_int(&data[.. end]) as usize;
+    let nb_arg = data[.. end].iter().take(12).fold(0, |acc, b| acc * 10 + (b & 0x0f) as u32) as usize;
     let mut af = ArgumentationFramework::new(nb_arg);
     data = &data[end + 1..];
     loop {
-        if data[0] == b'#' {
-            let Some(end) = memchr(b'\n', data) else {break;};
-            data = &data[end+1..];
-            continue;
+        unsafe {
+            if *data.get_unchecked(0) == b'#' {
+                let Some(end) = memchr(b'\n', data) else {break;};
+                data = &data[end+1..];
+            }
+            else { break; }
         }
-        let Some(separator) = memchr(b' ', data) else {
-            break;
-        };
-        let Some(end) = memchr(b'\n', &data[separator..]) else {break;};
+    }
+    loop {
+        let Some(separator) = memchr(b' ', data) else { break; };
+        let Some(end) = memchr(b'\n', &data[separator..]) else { break; };
         let att = bytes_to_int(&data[..separator]);
         let target = bytes_to_int(&data[separator + 1..separator + end]);
         af.add_attack(att, target);
         data = &data[separator + end + 1..];
-        if data.is_empty() {break;}
     }
     af
 }
@@ -88,7 +89,6 @@ fn _parse_cnfattack_line (line : &str) -> (u32,u32) {
 }
 
 pub fn reading_apx( file_path : &str) -> ArgumentationFramework {
-    
     let nb_arg = find_number_argument(file_path);
     let af = ArgumentationFramework::new(nb_arg as usize);
 

@@ -19,7 +19,7 @@ pub enum Semantics {
 #[derive(Debug, Clone)]
 pub struct Task {
     pub problem : Problem,
-    pub problem_name : String,
+    pub _problem_name : String,
     pub semantics : Semantics,
     pub argument : usize,
     pub verbose : bool,
@@ -67,7 +67,7 @@ pub fn launcher() {
         }
     };
     let pr_sm = cli.task.clone();
-    let problem_name = pr_sm.clone().unwrap();
+    let _problem_name = pr_sm.clone().unwrap();
     let (problem, semantics) = match pr_sm {
         Some(t) => {
             if !t.contains('-') {
@@ -99,7 +99,7 @@ pub fn launcher() {
             exit(1) 
         }
     };
-    let task = Task { problem, problem_name, semantics, argument : argument_name, 
+    let task = Task { problem, _problem_name, semantics, argument : argument_name, 
         verbose : cli.verbose,
     };
     let file = cli.input_af.clone().unwrap();
