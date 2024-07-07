@@ -67,30 +67,33 @@ fn use_nn(task : Task, features : [f32;9]) {
 }
 pub fn af_nn(af : ArgumentationFramework, task : Task)  {
     let start = Instant::now();
+    if af.af_attackee[task.argument].contains(& (task.argument as u32)) && (task.problem != Problem::DS && task.semantics != Semantics::ST) {
+        if task.verbose {
+            print!("None;None;");
+        }
+        println!("NO");
+        exit(0);
+    }
     let gr = gr_solver::solve(&af);
     if gr.contains(&task.argument) {
         if task.verbose {
-            print!("None;None;");
+            print!("{};", start.elapsed().as_millis() as f32 / 1000.);
+            print!("None;");
 		}
-        println!("YES");
+        println!("YESG");
         exit(0);
     }
     for attacker in &af.af_attacker[task.argument] {
 		if gr.contains(&(*attacker as usize)) {
 			if task.verbose {
-				print!("None;None;");
+                print!("{};", start.elapsed().as_millis() as f32 / 1000.);
+				print!("None;");
 			}
 			println!("NO");
             exit(0);
 		}
 	}
-    if af.af_attackee[task.argument].contains(& (task.argument as u32)) {
-        if task.verbose {
-		    print!("None;None;");
-		}
-		println!("NO");
-        exit(0);
-    }
+
     if task.verbose {
         print!("{};", start.elapsed().as_millis() as f32 / 1000.);
     }

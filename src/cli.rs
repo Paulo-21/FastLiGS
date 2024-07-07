@@ -12,7 +12,7 @@ pub enum Format {
 pub enum Problem {
     DS, DC, SE
 }
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Semantics {
     CO,ST,Sst,Stg,Id,PR
 }
