@@ -16,12 +16,9 @@ use std::time::Instant;
 fn use_nn(task : Task, features : [f32;9]) {
     let now = Instant::now();
 
-    if task.verbose {
-        println!("{};", now.elapsed().as_millis() as f32 /1000.);
-    }
     let device = NdArrayDevice::default();
     let inputs = Tensor::<NdArray, 1>::from_data(features, &device);
-
+    
     let proba = match task.problem {
         Problem::DC => {
             match task.semantics {
@@ -61,6 +58,9 @@ fn use_nn(task : Task, features : [f32;9]) {
             panic!("Problem is not supported");
         }
     };
+    if task.verbose {
+        print!("{};", now.elapsed().as_millis() as f32 /1000.);
+    }
     
     if proba > 0.5 { println!("YES"); }
     else { println!("NO"); }
@@ -80,7 +80,7 @@ pub fn af_nn(af : ArgumentationFramework, task : Task)  {
             print!("{};", start.elapsed().as_millis() as f32 / 1000.);
             print!("None;");
 		}
-        println!("YESG");
+        println!("YES");
         exit(0);
     }
     for attacker in &af.af_attacker[task.argument] {

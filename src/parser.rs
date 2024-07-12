@@ -9,7 +9,8 @@ pub fn get_input(file_path : &str, format : Format) -> ArgumentationFramework {
         Format::Apx => reading_apx(file_path),
         //Format::Cnf => _reading_cnf(file_path),
         //Format::Cnf => _reading_cnf_f(file_path),
-        Format::Cnf => reading_cnf_perf(file_path),
+        //Format::Cnf => reading_cnf_perf(file_path),
+        Format::Cnf => reading_cnf_perf2(file_path),
     }
 }
 
@@ -70,7 +71,7 @@ fn _bytes_to_int(bytes: &[u8]) -> u32 {
     }
     acc-1
 }
-pub fn reading_cnf_perf( file_path : &str) -> ArgumentationFramework{
+pub fn _reading_cnf_perf( file_path : &str) -> ArgumentationFramework{
     let mmap: Mmap;
     let mut data;
     {
@@ -106,6 +107,65 @@ pub fn reading_cnf_perf( file_path : &str) -> ArgumentationFramework{
             for a in data.get_unchecked(..end).iter() { target = target*10  + (*a & 0x0f) as u32; }
             af.add_attack(att-1, target-1);
             data = &data.get_unchecked(end + 1..);
+        }
+    }
+    af
+}
+pub fn reading_cnf_perf2( file_path : &str) -> ArgumentationFramework{
+    let mmap: Mmap;
+    let mut data;
+    {
+        let file = std::fs::File::open(file_path).unwrap();
+        mmap = unsafe { Mmap::map(&file).unwrap() };
+        data = &*mmap;
+    }
+    let Some(separator) = memchr(b' ', data) else {panic!("oups")};
+    data = &data[separator+1..];
+    let Some(separator) = memchr(b' ', data) else {panic!("oups")};
+    data = &data[separator+1..];
+    let end = memchr(b'\n', data).unwrap();
+    let nb_arg = data[.. end].iter().take(12).fold(0, |acc, b| acc * 10 + (b & 0x0f) as u32) as usize;
+    let mut af = ArgumentationFramework::new(nb_arg);
+    data = &data[end + 1..];
+    loop {
+        unsafe {
+            if *data.get_unchecked(0) == b'#' {
+                let Some(end) = memchr(b'\n', data) else {break;};
+                data = &data.get_unchecked(end+1..);
+            }
+            else { break; }
+        }
+    }
+    let mut i = 0;
+    'block: loop  {
+        unsafe {
+            if data.len() == i {
+                break;
+            }
+            let mut att = 0;
+            loop {
+                if *data.get_unchecked(i) == b' ' {
+                    i+=1;
+                    break;
+                }
+                #[allow(unused_assignments)]
+                if *data.get_unchecked(i) == b'\n' {
+                    i+=1;
+                    break 'block;
+                }
+                att = att*10 + (data.get_unchecked(i) & 0x0f) as u32;
+                i += 1;
+            }
+            let mut target = 0;
+            loop {
+                if *data.get_unchecked(i) == b'\n' {
+                    i+=1;
+                    break;
+                }
+                target = target*10 + (data.get_unchecked(i) & 0x0f) as u32;
+                i += 1;
+            }
+            af.add_attack(att-1, target-1);
         }
     }
     af
