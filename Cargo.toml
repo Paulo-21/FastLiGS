@@ -9,8 +9,8 @@ edition = "2021"
 burn-import = "0.15"
 
 [dependencies]
-burn = { version = "0.15", features= ["ndarray"]}
-burn-ndarray = "0.15"
+burn = { version = "0.16", features= ["ndarray"]}
+burn-ndarray = "0.16"
 clap = { version = "4.5", features = ["derive"] }
 memmap2 = "0.9"
 memchr = "2.7"
