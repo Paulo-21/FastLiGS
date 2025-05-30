@@ -8,13 +8,15 @@ pub enum Format {
     Apx,
     Cnf
 }
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Problem {
     DS, DC, SE
 }
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Semantics {
-    CO,ST,Sst,Stg,Id,PR
+    CO,ST,SST,STG,ID,PR
 }
 #[derive(Debug, Clone)]
 pub struct Task {
@@ -79,18 +81,17 @@ pub fn launcher() {
             let problem = match problem.as_str() {
                 "DC" => Problem::DC,
                 "DS" => Problem::DS,
-                "SE" => Problem::SE,
                 _ => { eprintln!("This problem is not handled by the program at this time"); exit(1);}
             };
             let semantics = String::from(r.next().unwrap());
             let semantics = match semantics.as_str() {
                 "ST" => Semantics::ST,
-                "SST" => Semantics::Sst,
-                "STG" => Semantics::Stg,
-                "ID" => Semantics::Id,
+                "SST" => Semantics::SST,
+                //"STG" => Semantics::Stg,
+                "ID" => Semantics::ID,
                 "PR" => Semantics::PR,
                 "CO" => Semantics::CO,
-                _ => { eprintln!("This problem is not handled by the program at this time"); exit(1);}
+                _ => { eprintln!("This semantics is not handled by the program at this time"); exit(1);}
             };
             (problem, semantics)
         },
@@ -123,5 +124,5 @@ pub fn launcher() {
 }
 
 fn print_supported_problems() {
-    println!("[DC-CO,DC-ST,DC-SST,DC-STG,DC-ID,DS-PR,DS-ST,DS-SST,DS-STG]");
+    println!("[DC-CO,DC-ST,DC-SST,DC-ID,DS-PR,DS-ST,DS-SST]");
 }

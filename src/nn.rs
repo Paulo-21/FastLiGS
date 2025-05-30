@@ -8,7 +8,10 @@ use crate::gr_solver;
 use crate::gradualsemantics_opt;
 use crate::model::linear_dc_co;
 use crate::model::linear_dc_st;
+use crate::model::linear_dc_sst;
+use crate::model::linear_dc_id;
 use crate::model::linear_ds_pr;
+use crate::model::linear_ds_sst;
 use crate::model::linear_ds_st;
 use std::process::exit;
 use std::time::Instant;
@@ -19,18 +22,24 @@ fn use_nn(task : Task, features : [f32;9]) {
     let device = NdArrayDevice::default();
     let inputs = Tensor::<NdArray, 1>::from_data(features, &device);
     
-    let proba = match task.problem {
+    let nn_output = match task.problem {
         Problem::DC => {
             match task.semantics {
                 Semantics::CO => {
                     let model : linear_dc_co::Model<NdArray<f32>> = linear_dc_co::Model::default();
-                    let o = model.forward(inputs);
-                    o.into_scalar()
+                    model.forward(inputs)
                 },
                 Semantics::ST => {
                     let model : linear_dc_st::Model<NdArray<f32>> = linear_dc_st::Model::default();
-                    let o = model.forward(inputs);
-                    o.into_scalar()
+                    model.forward(inputs)
+                },
+                Semantics::SST => {
+                    let model : linear_dc_sst::Model<NdArray<f32>> = linear_dc_sst::Model::default();
+                    model.forward(inputs)
+                },
+                Semantics::ID => {
+                    let model : linear_dc_id::Model<NdArray<f32>> = linear_dc_id::Model::default();
+                    model.forward(inputs)
                 },
                 _ => {
                     panic!("Unsupported semantics");
@@ -39,15 +48,17 @@ fn use_nn(task : Task, features : [f32;9]) {
         },
         Problem::DS => {
             match task.semantics {
-                Semantics::ST => {
-                    let model : linear_ds_st::Model<NdArray<f32>> = linear_ds_st::Model::default();
-                    let o = model.forward(inputs);
-                    o.into_scalar()
-                },
                 Semantics::PR => {
                     let model : linear_ds_pr::Model<NdArray<f32>> = linear_ds_pr::Model::default();
-                    let o = model.forward(inputs);
-                    o.into_scalar()
+                    model.forward(inputs)
+                },
+                Semantics::ST => {
+                    let model : linear_ds_st::Model<NdArray<f32>> = linear_ds_st::Model::default();
+                    model.forward(inputs)
+                },
+                Semantics::SST => {
+                    let model : linear_ds_sst::Model<NdArray<f32>> = linear_ds_sst::Model::default();
+                    model.forward(inputs)
                 },
                 _ => {
                     panic!("Unsupported semantics");
@@ -58,9 +69,10 @@ fn use_nn(task : Task, features : [f32;9]) {
             panic!("Problem is not supported");
         }
     };
-    if task.verbose {
-        print!("{};", now.elapsed().as_millis() as f32 /1000.);
-    }
+    //get the probabilty of acceptability
+    let proba = nn_output.into_scalar();
+    
+    if task.verbose { print!("{};", now.elapsed().as_micros() as f32 /1000000.); }
     
     if proba > 0.5 { println!("YES"); }
     else { println!("NO"); }
@@ -93,7 +105,7 @@ pub fn af_nn(af : ArgumentationFramework, task : Task)  {
             exit(0);
 		}
 	}
-
+    
     if task.verbose {
         print!("{};", start.elapsed().as_millis() as f32 / 1000.);
     }
@@ -106,7 +118,7 @@ pub fn af_nn(af : ArgumentationFramework, task : Task)  {
     let features : [f32;9]= [0.5, hcat as f32, card as f32, nsa as f32, maxb as f32, eucli as f32, in_degree_centrality, out_degree_centrality, self_attack];
     
     if task.verbose {
-        print!("{};", start.elapsed().as_millis() as f32 / 1000.);
+        print!("{};", start.elapsed().as_micros() as f32 / 1000000.);
     }
     
     use_nn(task, features);

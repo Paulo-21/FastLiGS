@@ -13,7 +13,7 @@ pub fn solve(af : ArgumentationFramework, task_argument : usize) -> (f64, f64, f
 	let mut old_score_t_arg_nsa = 0.;
 	let mut old_score_t_arg_max = 0.;
 	let mut old_score_t_arg_card = 0.;
-	//let mut old_score_t_arg_eucli = 0.;
+	let mut old_score_t_arg_eucli = 0.;
 	unsafe {
 	while nb_hit < index_to_hit.len() {
 		let arg = *index_to_hit.get_unchecked(nb_hit);
@@ -94,7 +94,7 @@ pub fn solve(af : ArgumentationFramework, task_argument : usize) -> (f64, f64, f
 			break;
 		}
 		old_score_t_arg_card = *scores_arg.get_unchecked(task_argument);
-	}/*
+	}
 	scores_arg.fill(1.);
 	loop  { // Euclidian based
 		for arg in &index_to_hit {
@@ -109,7 +109,7 @@ pub fn solve(af : ArgumentationFramework, task_argument : usize) -> (f64, f64, f
 			break;
 		}
 		old_score_t_arg_eucli = *scores_arg.get_unchecked(task_argument);
-	}*/
 	}
-	(old_score_t_arg_hcat, old_score_t_arg_nsa, old_score_t_arg_card, old_score_t_arg_max, 0./*old_score_t_arg_eucli*/)
+	}
+	(old_score_t_arg_hcat, old_score_t_arg_nsa, old_score_t_arg_card, old_score_t_arg_max, old_score_t_arg_eucli)
 }
