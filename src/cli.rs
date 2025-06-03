@@ -28,11 +28,11 @@ pub struct Task {
 }
 
 #[derive(Parser, Debug)]
-#[command(author="Paul Cibier", version, about="This tool can solve all the problems in the approximate track of ICCMA 2023",
+#[command(author="Paul Cibier", version, about="Fast Linear Gradual Sémantics \n This tool can solve all the problems in the approximate track of ICCMA 2025",
 long_about = None, arg_required_else_help = true)]
 struct Cli {
     #[arg(short, long)]
-    /// Quary argument for credulous and skeptical acceptance
+    /// Query argument for credulous and skeptical acceptance
     argument : Option<String>,
     #[arg(short='f', long="input_AF")]
     /// Path of the file containing the AF.
