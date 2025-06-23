@@ -5,8 +5,9 @@ fn main() {
     let supported_task = ["DC_CO", "DC_ST","DC_SST", "DC_ID", "DS_ST","DS_SST", "DS_PR"];
     for task in supported_task {
         let mut path = String::from("model_onnx/linear_");
+        //let mut path = String::from("../af_research/IAFGNN/model_ln/linear_");
         path.push_str(task);
-        path.push_str("_9f3_d0.2.onnx");
+        path.push_str("_9f6_d0.2.onnx");
         ModelGen::new()
             .input(&path)
             .out_dir("model/")
